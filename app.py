@@ -1,4 +1,5 @@
 import os
+import re
 from contextlib import contextmanager
 
 import psycopg2
@@ -16,6 +17,20 @@ DB_SETTINGS = {
     "password": os.getenv("DB_PASSWORD", "dashboard_dev_pw"),
 }
 ALLOWED_ORIGINS = {"http://localhost:5173", "http://127.0.0.1:5173"}
+
+
+def password_problem(password):
+    """Same rules as the React forms: 6+ characters, upper, lower, and a special character."""
+    missing = []
+    if len(password) < 6:
+        missing.append("at least 6 characters")
+    if not re.search(r"[A-Z]", password):
+        missing.append("an uppercase letter")
+    if not re.search(r"[a-z]", password):
+        missing.append("a lowercase letter")
+    if not re.search(r"[^A-Za-z0-9\s]", password):
+        missing.append("a special character")
+    return f"Password needs {', '.join(missing)}." if missing else None
 
 
 @contextmanager
@@ -64,8 +79,9 @@ def register():
     username, password = read_credentials()
     if len(username) < 3:
         return jsonify(success=False, message="Username must be at least 3 characters."), 400
-    if len(password) < 6:
-        return jsonify(success=False, message="Password must be at least 6 characters."), 400
+    problem = password_problem(password)
+    if problem:
+        return jsonify(success=False, message=problem), 400
 
     try:
         with cursor() as cur:
