@@ -107,6 +107,27 @@ def login():
     return jsonify(success=True, message="Login successful.", user={"id": row[0], "username": row[1]}), 200
 
 
+@app.post("/api/change-password")
+def change_password():
+    data = request.get_json(silent=True) or {}
+    username = str(data.get("username", "")).strip()
+    current = str(data.get("current_password", ""))
+    new = str(data.get("new_password", ""))
+
+    with cursor() as cur:
+        cur.execute("SELECT password_hash FROM users WHERE username = %s", (username,))
+        row = cur.fetchone()
+        if row is None or not check_password_hash(row[0], current):
+            return jsonify(success=False, message="Current password is incorrect."), 401
+        problem = password_problem(new)
+        if problem:
+            return jsonify(success=False, message=problem), 400
+        if new == current:
+            return jsonify(success=False, message="New password must be different from the current password."), 400
+        cur.execute("UPDATE users SET password_hash = %s WHERE username = %s", (generate_password_hash(new), username))
+    return jsonify(success=True, message="Password changed."), 200
+
+
 @app.get("/api/users")
 def list_users():
     with cursor() as cur:

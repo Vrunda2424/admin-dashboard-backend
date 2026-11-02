@@ -27,3 +27,4 @@ Then: Databases > admin_dashboard > Schemas > public > Tables > users.
 | POST | /api/register | `{"username": "...", "password": "..."}` |
 | POST | /api/login | `{"username": "...", "password": "..."}` |
 | GET | /api/users | none. Returns id, username, created_at (never the password hash) |
+| POST | /api/change-password | `{"username": "...", "current_password": "...", "new_password": "..."}` |
