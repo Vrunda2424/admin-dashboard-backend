@@ -115,7 +115,7 @@ def add_cors_headers(response):
     if origin in ALLOWED_ORIGINS:
         response.headers["Access-Control-Allow-Origin"] = origin
         response.headers["Access-Control-Allow-Headers"] = "Content-Type"
-        response.headers["Access-Control-Allow-Methods"] = "GET, POST, OPTIONS"
+        response.headers["Access-Control-Allow-Methods"] = "GET, POST, PUT, DELETE, OPTIONS"
     return response
 
 
@@ -203,6 +203,42 @@ def list_users():
         for r in rows
     ]
     return jsonify(users), 200
+
+
+def row_to_user(r):
+    return {"id": r[0], "username": r[1], "email": r[2], "role": r[3], "status": r[4], "registration_date": iso(r[5])}
+
+
+@app.put("/api/users/<int:user_id>")
+def update_user(user_id):
+    """Change only the role and status of one user. Every other field stays as it is."""
+    data = request.get_json(silent=True) or {}
+    role, status = data.get("role"), data.get("status")
+    if role not in ROLES:
+        return jsonify(success=False, message=f"Role must be one of: {', '.join(ROLES)}."), 400
+    if status not in STATUSES:
+        return jsonify(success=False, message=f"Status must be one of: {', '.join(STATUSES)}."), 400
+
+    with cursor() as cur:
+        cur.execute(
+            "UPDATE users SET role = %s, status = %s WHERE id = %s "
+            "RETURNING id, username, email, role, status, registration_date",
+            (role, status, user_id),
+        )
+        row = cur.fetchone()
+    if row is None:
+        return jsonify(success=False, message="User not found."), 404
+    return jsonify(success=True, message="User updated.", user=row_to_user(row)), 200
+
+
+@app.delete("/api/users/<int:user_id>")
+def delete_user(user_id):
+    with cursor() as cur:
+        cur.execute("DELETE FROM users WHERE id = %s RETURNING id", (user_id,))
+        row = cur.fetchone()
+    if row is None:
+        return jsonify(success=False, message="User not found."), 404
+    return jsonify(success=True, message="User deleted."), 200
 
 
 if __name__ == "__main__":

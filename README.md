@@ -28,3 +28,5 @@ Host `localhost`, Port `5433`, Database `admin_dashboard`, User `postgres`, Pass
 | POST | /api/login | `{"username", "password"}` (inactive users are refused) |
 | POST | /api/change-password | `{"username", "current_password", "new_password"}` |
 | GET | /api/users | none. Returns id, username, email, role, status, registration_date (never the password) |
+| PUT | /api/users/<id> | `{"role": "Admin\|Editor\|Viewer", "status": "Active\|Inactive"}`. Updates only role and status |
+| DELETE | /api/users/<id> | none. Deletes the user |
