@@ -1,37 +1,21 @@
-import os
 import re
-from contextlib import contextmanager
 
 import bcrypt
 import psycopg2
 from flask import Flask, jsonify, request
 from werkzeug.security import check_password_hash
 
-app = Flask(__name__)
+from db import cursor
+from pages import pages_bp
+from schema import create_page_tables
 
-# Defaults match the Docker container from the README.
-DB_SETTINGS = {
-    "host": os.getenv("DB_HOST", "localhost"),
-    "port": os.getenv("DB_PORT", "5433"),
-    "dbname": os.getenv("DB_NAME", "admin_dashboard"),
-    "user": os.getenv("DB_USER", "postgres"),
-    "password": os.getenv("DB_PASSWORD", "dashboard_dev_pw"),
-}
+app = Flask(__name__)
+app.register_blueprint(pages_bp)
+
 ALLOWED_ORIGINS = {"http://localhost:5173", "http://127.0.0.1:5173"}
 ROLES = ("Admin", "Editor", "Viewer")
 STATUSES = ("Active", "Inactive")
 EMAIL_RE = re.compile(r"^[^\s@]+@[^\s@]+\.[^\s@]+$")
-
-
-@contextmanager
-def cursor():
-    """Open a connection, commit on success, roll back on error, always close."""
-    conn = psycopg2.connect(**DB_SETTINGS)
-    try:
-        with conn, conn.cursor() as cur:
-            yield cur
-    finally:
-        conn.close()
 
 
 def init_db():
@@ -243,5 +227,6 @@ def delete_user(user_id):
 
 if __name__ == "__main__":
     init_db()
+    create_page_tables()
     # Port 5001: macOS uses port 5000 for AirPlay Receiver.
     app.run(debug=True, port=5001)

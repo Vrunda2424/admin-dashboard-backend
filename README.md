@@ -18,7 +18,14 @@ Runs at http://localhost:5001. On start it creates the `users` table, or upgrade
 
 Passwords are hashed with bcrypt. Accounts made before bcrypt was added can still log in.
 
-## 3. View the data in pgAdmin
+## 3. Fill the page tables (once)
+```bash
+python seed.py
+```
+This creates the page tables (overview, analytics, banking, users page) and fills them with the dummy data.
+It is safe to run again. If an API answers "Run python seed.py", this step was skipped.
+
+## 4. View the data in pgAdmin
 Host `localhost`, Port `5433`, Database `admin_dashboard`, User `postgres`, Password `dashboard_dev_pw`.
 
 ## Endpoints
@@ -30,3 +37,9 @@ Host `localhost`, Port `5433`, Database `admin_dashboard`, User `postgres`, Pass
 | GET | /api/users | none. Returns id, username, email, role, status, registration_date (never the password) |
 | PUT | /api/users/<id> | `{"role": "Admin\|Editor\|Viewer", "status": "Active\|Inactive"}`. Updates only role and status |
 | DELETE | /api/users/<id> | none. Deletes the user |
+| GET | /api/overview?range=7d\|30d\|3m\|year | Overview cards, charts, and recent table for the date range |
+| GET | /api/analytics?range=... | Analytics statistics and charts for the date range |
+| GET | /api/internet-banking/dashboard, /api/internet-banking/users | Internet Banking pages |
+| GET | /api/mobile-banking/dashboard, /api/mobile-banking/users | Mobile Banking pages |
+| GET | /api/users-page | Users page table |
+| GET, PUT | /api/settings | Logged-in user's profile (GET takes ?username=) and saving it |
