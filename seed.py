@@ -136,6 +136,40 @@ BANKING = {
 }
 
 
+# User logs. Columns: id, username, action, ip_address, device, browser, timestamp, status, os, location, session_id, details
+LOGS = {
+    "user_logs_internet_banking": [
+        (1, "anita.verma", "Login", "103.21.58.14", "Windows PC", "Chrome 130", "2026-10-26 10:42:15", "Success", "Windows 11", "Hyderabad, IN", "IB-S-80412", "Signed in with password and OTP."),
+        (2, "rahul.mehta", "Fund Transfer", "49.37.201.8", "MacBook Air", "Safari 18", "2026-10-26 09:58:40", "Success", "macOS 15", "Mumbai, IN", "IB-S-80377", "Transferred 25,000 INR to a saved beneficiary."),
+        (3, "sunita.rao", "Failed Login", "117.200.41.99", "Windows PC", "Edge 130", "2026-10-26 09:31:02", "Failed", "Windows 10", "Chennai, IN", "IB-S-80351", "Wrong password entered 3 times in a row."),
+        (4, "vikash.kumar", "Bill Payment", "152.58.19.220", "Linux PC", "Firefox 132", "2026-10-25 19:12:33", "Success", "Ubuntu 24.04", "Pune, IN", "IB-S-80290", "Paid an electricity bill of 1,840 INR."),
+        (5, "deepa.nair", "Password Change", "106.51.77.31", "MacBook Pro", "Chrome 130", "2026-10-25 17:45:09", "Success", "macOS 14", "Kochi, IN", "IB-S-80266", "Password changed after verifying the old password."),
+        (6, "manoj.pillai", "Statement Download", "103.21.58.77", "Windows PC", "Chrome 129", "2026-10-25 14:05:51", "Success", "Windows 11", "Bengaluru, IN", "IB-S-80231", "Downloaded the last 3 months statement as PDF."),
+        (7, "farah.khan", "Add Beneficiary", "49.205.12.140", "Windows PC", "Edge 130", "2026-10-25 11:20:18", "Failed", "Windows 11", "Delhi, IN", "IB-S-80198", "Beneficiary IFSC code was not valid."),
+        (8, "girish.shetty", "Login", "182.73.104.6", "MacBook Air", "Safari 17", "2026-10-24 18:30:47", "Success", "macOS 14", "Mangaluru, IN", "IB-S-80150", "Signed in with password and OTP."),
+        (9, "anita.verma", "Logout", "103.21.58.14", "Windows PC", "Chrome 130", "2026-10-24 12:10:05", "Success", "Windows 11", "Hyderabad, IN", "IB-S-80112", "Session ended by the user."),
+        (10, "rahul.mehta", "Failed Login", "223.188.9.52", "Linux PC", "Firefox 131", "2026-10-23 22:48:29", "Failed", "Fedora 40", "Ahmedabad, IN", "IB-S-80077", "Account locked after 5 wrong attempts."),
+        (11, "sunita.rao", "Fund Transfer", "117.200.41.99", "Windows PC", "Edge 130", "2026-10-23 16:02:11", "Success", "Windows 10", "Chennai, IN", "IB-S-80041", "Transferred 8,500 INR to a saved beneficiary."),
+        (12, "vikash.kumar", "Cheque Request", "152.58.19.220", "Linux PC", "Firefox 132", "2026-10-22 10:15:36", "Success", "Ubuntu 24.04", "Pune, IN", "IB-S-79988", "Requested a new cheque book."),
+    ],
+    "user_logs_mobile_banking": [
+        (1, "kavya.iyer", "UPI Payment", "49.36.88.201", "Pixel 8", "App WebView", "2026-10-26 11:05:22", "Success", "Android 15", "Bengaluru, IN", "MB-S-52031", "Paid 450 INR to a merchant using UPI."),
+        (2, "arjun.desai", "Biometric Login", "106.208.14.77", "iPhone 15", "App WebView", "2026-10-26 10:48:09", "Success", "iOS 18", "Mumbai, IN", "MB-S-52017", "Signed in with Face ID."),
+        (3, "nisha.patel", "OTP Failed", "27.61.205.9", "Galaxy S23", "Mobile Chrome", "2026-10-26 10:12:44", "Failed", "Android 14", "Surat, IN", "MB-S-51990", "The OTP expired before it was entered."),
+        (4, "sameer.joshi", "QR Payment", "152.57.30.118", "OnePlus 12", "App WebView", "2026-10-25 20:33:57", "Success", "Android 15", "Nagpur, IN", "MB-S-51944", "Scanned a shop QR code and paid 1,200 INR."),
+        (5, "lakshmi.menon", "Mobile Recharge", "117.246.18.64", "iPhone 13", "App WebView", "2026-10-25 18:21:30", "Success", "iOS 17", "Thiruvananthapuram, IN", "MB-S-51902", "Recharged a prepaid number with 299 INR."),
+        (6, "tarun.bhatt", "App Login", "49.43.160.33", "Redmi Note 13", "App WebView", "2026-10-25 15:09:12", "Success", "Android 14", "Jaipur, IN", "MB-S-51871", "Signed in with a 6-digit PIN."),
+        (7, "ishita.roy", "Add Payee", "106.220.5.147", "iPhone 14", "App WebView", "2026-10-25 12:47:58", "Failed", "iOS 18", "Kolkata, IN", "MB-S-51833", "The payee account number was not found."),
+        (8, "harish.gowda", "App Update", "27.59.72.201", "Galaxy A54", "Mobile Chrome", "2026-10-24 21:15:40", "Success", "Android 13", "Mysuru, IN", "MB-S-51790", "Updated the app from 3.9.5 to 4.0.2."),
+        (9, "kavya.iyer", "Failed Login", "49.36.88.201", "Pixel 8", "App WebView", "2026-10-24 09:02:16", "Failed", "Android 15", "Bengaluru, IN", "MB-S-51742", "Wrong PIN entered twice."),
+        (10, "arjun.desai", "UPI Payment", "106.208.14.77", "iPhone 15", "App WebView", "2026-10-23 19:40:05", "Success", "iOS 18", "Mumbai, IN", "MB-S-51705", "Sent 2,000 INR to a friend using UPI."),
+        (11, "nisha.patel", "Biometric Login", "27.61.205.9", "Galaxy S23", "App WebView", "2026-10-23 08:55:21", "Success", "Android 14", "Surat, IN", "MB-S-51668", "Signed in with a fingerprint."),
+        (12, "tarun.bhatt", "QR Payment", "49.43.160.33", "Redmi Note 13", "App WebView", "2026-10-22 17:28:49", "Failed", "Android 14", "Jaipur, IN", "MB-S-51630", "The payment was declined because of low balance."),
+    ],
+}
+LOG_COLUMNS = "id, username, action, ip_address, device, browser, timestamp, status, os, location, session_id, details"
+
+
 def seed():
     create_page_tables()
     users = build_users()
@@ -144,7 +178,7 @@ def seed():
         cur.execute(
             "TRUNCATE date_ranges, users_page_data, overview_stats, monthly_registrations, user_distribution, "
             "recent_registrations, analytics_data, analytics_trend, analytics_roles, internet_banking_dashboard, "
-            "internet_banking_users, mobile_banking_dashboard, mobile_banking_users RESTART IDENTITY CASCADE"
+            "internet_banking_users, mobile_banking_dashboard, mobile_banking_users, user_logs_internet_banking, user_logs_mobile_banking RESTART IDENTITY CASCADE"
         )
         cur.executemany(
             "INSERT INTO users_page_data (id, name, email, role, status, registered_at) VALUES (%s, %s, %s, %s, %s, %s)",
@@ -172,6 +206,9 @@ def seed():
                 rows += [(section, i, label, value, None) for i, (label, value) in enumerate(cfg[section])]
             cur.executemany(f"INSERT INTO {table} (section, sort_order, label, item_value, display_value) VALUES (%s, %s, %s, %s, %s)", rows)
             cur.executemany(cfg["users_sql"], cfg["users"])
+
+        for table, rows in LOGS.items():
+            cur.executemany(f"INSERT INTO {table} ({LOG_COLUMNS}) VALUES ({', '.join(['%s'] * 12)})", rows)
 
         # A starter profile for the admin account (other accounts get defaults from the users table).
         cur.execute("INSERT INTO user_profiles VALUES ('admin', 'Admin User', '9876543210') ON CONFLICT DO NOTHING")

@@ -43,3 +43,5 @@ Host `localhost`, Port `5433`, Database `admin_dashboard`, User `postgres`, Pass
 | GET | /api/mobile-banking/dashboard, /api/mobile-banking/users | Mobile Banking pages |
 | GET | /api/users-page | Users page table |
 | GET, PUT | /api/settings | Logged-in user's profile (GET takes ?username=) and saving it |
+| GET | /api/internet-banking/user-logs, /api/mobile-banking/user-logs | List of log entries for the channel |
+| GET | /api/internet-banking/user-logs/<id>, /api/mobile-banking/user-logs/<id> | Full details of one log entry |

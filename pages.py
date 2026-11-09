@@ -14,12 +14,14 @@ BANKING = {
         "dashboard": "internet_banking_dashboard",
         "users": "internet_banking_users",
         "name": "Internet Banking",
+        "logs": "user_logs_internet_banking",
         "columns": [("customer_id", "Customer ID"), ("name", "Name"), ("account_type", "Account type"), ("last_login", "Last login"), ("status", "Status")],
     },
     "mobile-banking": {
         "dashboard": "mobile_banking_dashboard",
         "users": "mobile_banking_users",
         "name": "Mobile Banking",
+        "logs": "user_logs_mobile_banking",
         "columns": [("user_id", "User ID"), ("name", "Name"), ("device", "Device"), ("app_version", "App version"), ("status", "Status")],
     },
 }
@@ -139,10 +141,42 @@ def users_view(table, name, columns):
     return view
 
 
+LOG_SUMMARY = ["id", "username", "action", "ip_address", "device", "browser", "timestamp", "status"]
+LOG_DETAIL = LOG_SUMMARY + ["os", "location", "session_id", "details"]
+
+
+def log_to_dict(columns, row):
+    item = dict(zip(columns, row))
+    item["timestamp"] = item["timestamp"].isoformat()
+    return item
+
+
+def logs_list_view(table, name):
+    def view():
+        with cursor() as cur:
+            cur.execute(f"SELECT {', '.join(LOG_SUMMARY)} FROM {table} ORDER BY timestamp DESC, id DESC")
+            rows = cur.fetchall()
+        return jsonify(name=name, logs=[log_to_dict(LOG_SUMMARY, r) for r in rows])
+    return view
+
+
+def log_detail_view(table):
+    def view(log_id):
+        with cursor() as cur:
+            cur.execute(f"SELECT {', '.join(LOG_DETAIL)} FROM {table} WHERE id = %s", (log_id,))
+            row = cur.fetchone()
+        if row is None:
+            return fail("Log entry not found.", 404)
+        return jsonify(log=log_to_dict(LOG_DETAIL, row))
+    return view
+
+
 # Table names come from the fixed BANKING dictionary above, never from the request.
 for slug, cfg in BANKING.items():
     pages_bp.add_url_rule(f"/api/{slug}/dashboard", f"{slug}-dashboard", dashboard_view(cfg["dashboard"]))
     pages_bp.add_url_rule(f"/api/{slug}/users", f"{slug}-users", users_view(cfg["users"], cfg["name"], cfg["columns"]))
+    pages_bp.add_url_rule(f"/api/{slug}/user-logs", f"{slug}-logs", logs_list_view(cfg["logs"], cfg["name"]))
+    pages_bp.add_url_rule(f"/api/{slug}/user-logs/<int:log_id>", f"{slug}-log-detail", log_detail_view(cfg["logs"]))
 
 
 def profile_from_row(row):

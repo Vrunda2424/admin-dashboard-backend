@@ -57,6 +57,16 @@ CREATE TABLE IF NOT EXISTS mobile_banking_users (
     id INTEGER PRIMARY KEY, user_id TEXT NOT NULL, name TEXT NOT NULL, device TEXT NOT NULL,
     app_version TEXT NOT NULL, status TEXT NOT NULL
 );
+CREATE TABLE IF NOT EXISTS user_logs_internet_banking (
+    id INTEGER PRIMARY KEY, username TEXT NOT NULL, action TEXT NOT NULL, ip_address TEXT NOT NULL,
+    device TEXT NOT NULL, browser TEXT NOT NULL, timestamp TIMESTAMP NOT NULL, status TEXT NOT NULL,
+    os TEXT NOT NULL, location TEXT NOT NULL, session_id TEXT NOT NULL, details TEXT NOT NULL
+);
+CREATE TABLE IF NOT EXISTS user_logs_mobile_banking (
+    id INTEGER PRIMARY KEY, username TEXT NOT NULL, action TEXT NOT NULL, ip_address TEXT NOT NULL,
+    device TEXT NOT NULL, browser TEXT NOT NULL, timestamp TIMESTAMP NOT NULL, status TEXT NOT NULL,
+    os TEXT NOT NULL, location TEXT NOT NULL, session_id TEXT NOT NULL, details TEXT NOT NULL
+);
 CREATE TABLE IF NOT EXISTS user_profiles (
     username TEXT PRIMARY KEY, full_name TEXT NOT NULL, phone TEXT NOT NULL DEFAULT ''
 );
