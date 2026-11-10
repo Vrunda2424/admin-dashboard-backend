@@ -73,6 +73,41 @@ CREATE TABLE IF NOT EXISTS user_profiles (
 """
 
 
+USERS_SQL = """
+CREATE TABLE IF NOT EXISTS users (
+    id SERIAL PRIMARY KEY,
+    username VARCHAR(50) UNIQUE NOT NULL,
+    email VARCHAR(120),
+    password TEXT NOT NULL,
+    role VARCHAR(20) NOT NULL DEFAULT 'support_staff',
+    status VARCHAR(20) NOT NULL DEFAULT 'Active',
+    registration_date TIMESTAMP NOT NULL DEFAULT NOW()
+);
+DO $$ BEGIN
+    IF EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name = 'users' AND column_name = 'password_hash') THEN
+        ALTER TABLE users RENAME COLUMN password_hash TO password;
+    END IF;
+    IF EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name = 'users' AND column_name = 'created_at') THEN
+        ALTER TABLE users RENAME COLUMN created_at TO registration_date;
+    END IF;
+END $$;
+ALTER TABLE users ADD COLUMN IF NOT EXISTS email VARCHAR(120);
+ALTER TABLE users ADD COLUMN IF NOT EXISTS role VARCHAR(20) NOT NULL DEFAULT 'support_staff';
+ALTER TABLE users ADD COLUMN IF NOT EXISTS status VARCHAR(20) NOT NULL DEFAULT 'Active';
+ALTER TABLE users ALTER COLUMN role SET DEFAULT 'support_staff';
+-- Older accounts used three roles. They move to the new five-role system.
+UPDATE users SET role = CASE role WHEN 'Admin' THEN 'admin' WHEN 'Editor' THEN 'manager' WHEN 'Viewer' THEN 'support_staff' ELSE role END
+WHERE role IN ('Admin', 'Editor', 'Viewer');
+CREATE UNIQUE INDEX IF NOT EXISTS users_email_key ON users (email);
+"""
+
+
+def create_users_table():
+    """Creates the users table, or upgrades an older one (new columns, new role names)."""
+    with cursor() as cur:
+        cur.execute(USERS_SQL)
+
+
 def create_page_tables():
     with cursor() as cur:
         cur.execute(SCHEMA_SQL)

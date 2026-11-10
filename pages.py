@@ -1,11 +1,13 @@
 import re
 
 import psycopg2
-from flask import Blueprint, jsonify, request
+from flask import Blueprint, g, jsonify, request
 
+from auth import require_login
 from db import cursor
 
 pages_bp = Blueprint("pages", __name__)
+pages_bp.before_request(require_login)  # every page endpoint needs a signed-in user
 
 RANGES = ("7d", "30d", "3m", "year")
 EMAIL_RE = re.compile(r"^[^\s@]+@[^\s@]+\.[^\s@]+$")
@@ -186,7 +188,7 @@ def profile_from_row(row):
 
 @pages_bp.get("/api/settings")
 def get_settings():
-    username = request.args.get("username", "").strip()
+    username = g.user["username"]  # always the signed-in user, never a name sent in the request
     with cursor() as cur:
         cur.execute(
             "SELECT u.username, u.email, u.role, p.full_name, p.phone FROM users u "
@@ -202,7 +204,7 @@ def get_settings():
 @pages_bp.put("/api/settings")
 def save_settings():
     data = request.get_json(silent=True) or {}
-    username = str(data.get("username", "")).strip()
+    username = g.user["username"]
     name = str(data.get("name", "")).strip()
     email = str(data.get("email", "")).strip().lower()
     phone = str(data.get("phone", "")).strip()

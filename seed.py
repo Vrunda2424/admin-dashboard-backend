@@ -4,13 +4,15 @@ import math
 from datetime import date, timedelta
 
 from db import cursor
-from schema import create_page_tables
+from passwords import hash_password
+from schema import create_page_tables, create_users_table
 
 FIRST = ["Asha", "Ravi", "Meera", "Kiran", "Anil", "Sneha", "Rohan", "Divya", "Arjun", "Pooja", "Vikram", "Neha"]
 LAST = ["Sharma", "Reddy", "Patel", "Iyer", "Nair", "Gupta", "Rao", "Singh", "Das", "Menon"]
 SIGNUPS_PER_MONTH = [1, 1, 1, 2, 2, 2, 2, 3, 3, 3]  # Jan to Oct 2026
 MONTHS = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"]
-ROLES = ["Admin", "Editor", "Viewer"]
+ROLES = ["super_admin", "admin", "manager", "analyst", "support_staff"]
+ROLE_CYCLE = ["manager", "analyst", "support_staff", "analyst", "manager", "support_staff", "admin"]
 RANGE_KEYS = ["7d", "30d", "3m", "year"]
 
 
@@ -24,7 +26,7 @@ def build_users():
                 "id": next_id, "name": name,
                 "email": f"{name.lower().replace(' ', '.')}{next_id}@example.com",
                 "status": "Inactive" if next_id % 4 == 0 else "Active",
-                "role": "Admin" if next_id % 7 == 0 else "Editor" if next_id % 3 == 0 else "Viewer",
+                "role": "super_admin" if next_id == 1 else ROLE_CYCLE[(next_id - 1) % len(ROLE_CYCLE)],
                 "registered": date(2026, month + 1, ((k * 5 + next_id) % 27) + 1),
             })
     return users
@@ -171,6 +173,7 @@ LOG_COLUMNS = "id, username, action, ip_address, device, browser, timestamp, sta
 
 
 def seed():
+    create_users_table()
     create_page_tables()
     users = build_users()
     ref = max(u["registered"] for u in users)
@@ -212,7 +215,16 @@ def seed():
 
         # A starter profile for the admin account (other accounts get defaults from the users table).
         cur.execute("INSERT INTO user_profiles VALUES ('admin', 'Admin User', '9876543210') ON CONFLICT DO NOTHING")
+
+        # The first Super Admin. There is no public sign-up, so this account creates everyone else.
+        # An existing account with this name is left as it is, so a changed password is never reset.
+        cur.execute(
+            "INSERT INTO users (username, email, password, role, status) VALUES (%s, %s, %s, 'super_admin', 'Active') "
+            "ON CONFLICT (username) DO NOTHING",
+            ("superadmin", "superadmin@dashboard.com", hash_password("Super@123")),
+        )
     print(f"Seeded {len(users)} users and {len(RANGE_KEYS)} date ranges.")
+    print("Super Admin account: superadmin / Super@123 (change the password after the first login)")
 
 
 if __name__ == "__main__":

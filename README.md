@@ -13,35 +13,52 @@ source venv/bin/activate
 pip install -r requirements.txt
 python app.py
 ```
-Runs at http://localhost:5001. On start it creates the `users` table, or upgrades an older table
-(adds email, role, status, and renames password_hash to password and created_at to registration_date).
+Runs at http://localhost:5001. On start it creates or upgrades the `users` table (older accounts move to the new roles).
 
-Passwords are hashed with bcrypt. Accounts made before bcrypt was added can still log in.
-
-## 3. Fill the page tables (once)
+## 3. Fill the tables and create the Super Admin (once)
 ```bash
 python seed.py
 ```
-This creates the page tables (overview, analytics, banking, users page) and fills them with the dummy data.
 It is safe to run again. If an API answers "Run python seed.py", this step was skipped.
+
+### First login
+| Username | Password | Role |
+|---|---|---|
+| `superadmin` | `Super@123` | Super Admin |
+
+There is **no public registration**. Sign in as the Super Admin and create every other user from the **User Access Management** page. Change this password after the first login (profile menu, Change Password).
 
 ## 4. View the data in pgAdmin
 Host `localhost`, Port `5433`, Database `admin_dashboard`, User `postgres`, Password `dashboard_dev_pw`.
 
+## Roles
+| Label | Stored value | Opens UAM | Can create, edit, and delete |
+|---|---|---|---|
+| Super Admin | `super_admin` | Yes | Every role, except their own row |
+| Admin | `admin` | Yes | Manager, Analyst, and Support Staff only |
+| Manager | `manager` | No | Nobody |
+| Analyst | `analyst` | No | Nobody |
+| Support Staff | `support_staff` | No | Nobody |
+
+All roles see every sidebar tab and every dashboard page. Older accounts moved to the new roles like this: Admin to `admin`, Editor to `manager`, Viewer to `support_staff`.
+
+The React app hides what a role cannot use, but **the API enforces the same rules**, so calling it directly does not bypass them.
+
+## Authentication
+`POST /api/login` returns a signed token (valid for 8 hours) and the user's role. Send the token with every other request: `Authorization: Bearer <token>`. Set `SECRET_KEY` in the environment for anything beyond local practice.
+
 ## Endpoints
-| Method | URL | Body |
-|---|---|---|
-| POST | /api/register | `{"username", "email", "password", "role", "status"}` (role: Admin, Editor, Viewer; status: Active, Inactive) |
-| POST | /api/login | `{"username", "password"}` (inactive users are refused) |
-| POST | /api/change-password | `{"username", "current_password", "new_password"}` |
-| GET | /api/users | none. Returns id, username, email, role, status, registration_date (never the password) |
-| PUT | /api/users/<id> | `{"role": "Admin\|Editor\|Viewer", "status": "Active\|Inactive"}`. Updates only role and status |
-| DELETE | /api/users/<id> | none. Deletes the user |
-| GET | /api/overview?range=7d\|30d\|3m\|year | Overview cards, charts, and recent table for the date range |
-| GET | /api/analytics?range=... | Analytics statistics and charts for the date range |
-| GET | /api/internet-banking/dashboard, /api/internet-banking/users | Internet Banking pages |
-| GET | /api/mobile-banking/dashboard, /api/mobile-banking/users | Mobile Banking pages |
-| GET | /api/users-page | Users page table |
-| GET, PUT | /api/settings | Logged-in user's profile (GET takes ?username=) and saving it |
-| GET | /api/internet-banking/user-logs, /api/mobile-banking/user-logs | List of log entries for the channel |
-| GET | /api/internet-banking/user-logs/<id>, /api/mobile-banking/user-logs/<id> | Full details of one log entry |
+| Method | URL | Who | Body or notes |
+|---|---|---|---|
+| POST | /api/login | Anyone | `{"username", "password"}`. Returns `token` and `user` (id, username, role). Inactive users are refused |
+| POST | /api/change-password | Anyone with the current password | `{"username", "current_password", "new_password"}` |
+| GET | /api/users | Super Admin, Admin | All users (never the password) |
+| POST | /api/users | Super Admin, Admin | `{"username", "email", "password", "role", "status"}`. Admin can only create manager, analyst, support_staff |
+| PUT | /api/users/<id> | Super Admin, Admin | `{"role", "status"}`. Not on your own row, and not above what you may assign |
+| DELETE | /api/users/<id> | Super Admin, Admin | Same rules as PUT |
+| GET | /api/overview?range=7d\|30d\|3m\|year | Any signed-in user | Overview cards, charts, and table |
+| GET | /api/analytics?range=... | Any signed-in user | Analytics statistics and charts |
+| GET | /api/internet-banking/dashboard, /users, /user-logs, /user-logs/<id> | Any signed-in user | Internet Banking pages |
+| GET | /api/mobile-banking/dashboard, /users, /user-logs, /user-logs/<id> | Any signed-in user | Mobile Banking pages |
+| GET | /api/users-page | Any signed-in user | Users page table |
+| GET, PUT | /api/settings | Any signed-in user | The signed-in user's own profile |
