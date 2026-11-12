@@ -62,3 +62,5 @@ The React app hides what a role cannot use, but **the API enforces the same rule
 | GET | /api/mobile-banking/dashboard, /users, /user-logs, /user-logs/<id> | Any signed-in user | Mobile Banking pages |
 | GET | /api/users-page | Any signed-in user | Users page table |
 | GET, PUT | /api/settings | Any signed-in user | The signed-in user's own profile |
+| GET | /api/mobile-banking/face-users | Any signed-in user | Face Users table (user id, username, name, email, mobile number, registration date, status) |
+| GET | /api/mobile-banking/face-logs, /api/mobile-banking/face-logs/<id> | Any signed-in user | Face activity logs, and the full details of one entry (including match score and liveness check) |

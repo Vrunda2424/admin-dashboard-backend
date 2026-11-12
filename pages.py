@@ -153,23 +153,25 @@ def log_to_dict(columns, row):
     return item
 
 
-def logs_list_view(table, name):
+def logs_list_view(table, name, title=None):
     def view():
         with cursor() as cur:
             cur.execute(f"SELECT {', '.join(LOG_SUMMARY)} FROM {table} ORDER BY timestamp DESC, id DESC")
             rows = cur.fetchall()
-        return jsonify(name=name, logs=[log_to_dict(LOG_SUMMARY, r) for r in rows])
+        return jsonify(name=name, title=title or f"{name} User Logs", logs=[log_to_dict(LOG_SUMMARY, r) for r in rows])
     return view
 
 
-def log_detail_view(table):
+def log_detail_view(table, extra=()):
+    columns = LOG_DETAIL + list(extra)  # extra: columns only this table has
+
     def view(log_id):
         with cursor() as cur:
-            cur.execute(f"SELECT {', '.join(LOG_DETAIL)} FROM {table} WHERE id = %s", (log_id,))
+            cur.execute(f"SELECT {', '.join(columns)} FROM {table} WHERE id = %s", (log_id,))
             row = cur.fetchone()
         if row is None:
             return fail("Log entry not found.", 404)
-        return jsonify(log=log_to_dict(LOG_DETAIL, row))
+        return jsonify(log=log_to_dict(columns, row))
     return view
 
 
@@ -179,6 +181,32 @@ for slug, cfg in BANKING.items():
     pages_bp.add_url_rule(f"/api/{slug}/users", f"{slug}-users", users_view(cfg["users"], cfg["name"], cfg["columns"]))
     pages_bp.add_url_rule(f"/api/{slug}/user-logs", f"{slug}-logs", logs_list_view(cfg["logs"], cfg["name"]))
     pages_bp.add_url_rule(f"/api/{slug}/user-logs/<int:log_id>", f"{slug}-log-detail", log_detail_view(cfg["logs"]))
+
+
+FACE_USER_COLUMNS = [
+    ("user_id", "User ID", None), ("username", "Username", None), ("name", "Name", None), ("email", "Email", None),
+    ("mobile_number", "Mobile Number", None), ("registration_date", "Registration Date", "datetime"), ("status", "Status", None),
+]
+
+
+@pages_bp.get("/api/mobile-banking/face-users")
+def face_users():
+    names = [c[0] for c in FACE_USER_COLUMNS]
+    with cursor() as cur:
+        cur.execute(f"SELECT id, {', '.join(names)} FROM face_users ORDER BY id")
+        rows = cur.fetchall()
+    users = [dict(zip(["id"] + names, r)) for r in rows]
+    for u in users:
+        u["registration_date"] = u["registration_date"].isoformat()
+    return jsonify(
+        name="Face Users",
+        columns=[{"key": k, "label": label, **({"type": kind} if kind else {})} for k, label, kind in FACE_USER_COLUMNS],
+        users=users,
+    )
+
+
+pages_bp.add_url_rule("/api/mobile-banking/face-logs", "face-logs", logs_list_view("face_logs", "Mobile Banking", "Face Logs"))
+pages_bp.add_url_rule("/api/mobile-banking/face-logs/<int:log_id>", "face-log-detail", log_detail_view("face_logs", ("match_score", "liveness")))
 
 
 def profile_from_row(row):

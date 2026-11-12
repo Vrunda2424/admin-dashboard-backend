@@ -67,6 +67,16 @@ CREATE TABLE IF NOT EXISTS user_logs_mobile_banking (
     device TEXT NOT NULL, browser TEXT NOT NULL, timestamp TIMESTAMP NOT NULL, status TEXT NOT NULL,
     os TEXT NOT NULL, location TEXT NOT NULL, session_id TEXT NOT NULL, details TEXT NOT NULL
 );
+CREATE TABLE IF NOT EXISTS face_users (
+    id INTEGER PRIMARY KEY, user_id TEXT NOT NULL, username TEXT NOT NULL, name TEXT NOT NULL, email TEXT NOT NULL,
+    mobile_number TEXT NOT NULL, registration_date TIMESTAMP NOT NULL, status TEXT NOT NULL
+);
+CREATE TABLE IF NOT EXISTS face_logs (
+    id INTEGER PRIMARY KEY, username TEXT NOT NULL, action TEXT NOT NULL, ip_address TEXT NOT NULL,
+    device TEXT NOT NULL, browser TEXT NOT NULL, timestamp TIMESTAMP NOT NULL, status TEXT NOT NULL,
+    os TEXT NOT NULL, location TEXT NOT NULL, session_id TEXT NOT NULL, details TEXT NOT NULL,
+    match_score TEXT NOT NULL, liveness TEXT NOT NULL
+);
 CREATE TABLE IF NOT EXISTS user_profiles (
     username TEXT PRIMARY KEY, full_name TEXT NOT NULL, phone TEXT NOT NULL DEFAULT ''
 );

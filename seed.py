@@ -172,6 +172,37 @@ LOGS = {
 LOG_COLUMNS = "id, username, action, ip_address, device, browser, timestamp, status, os, location, session_id, details"
 
 
+# Face recognition data (Mobile Banking).
+# face_users: id, user_id, username, name, email, mobile_number, registration_date, status
+FACE_USERS = [
+    (1, "FACE-2001", "kavya.iyer", "Kavya Iyer", "kavya.iyer@example.com", "+91 98450 11223", "2026-10-02 09:15:00", "Active"),
+    (2, "FACE-2002", "arjun.desai", "Arjun Desai", "arjun.desai@example.com", "+91 98200 44556", "2026-10-04 14:30:00", "Active"),
+    (3, "FACE-2003", "nisha.patel", "Nisha Patel", "nisha.patel@example.com", "+91 97120 33445", "2026-10-06 11:05:00", "Inactive"),
+    (4, "FACE-2004", "sameer.joshi", "Sameer Joshi", "sameer.joshi@example.com", "+91 99220 67788", "2026-10-09 16:40:00", "Active"),
+    (5, "FACE-2005", "lakshmi.menon", "Lakshmi Menon", "lakshmi.menon@example.com", "+91 94470 22110", "2026-10-12 10:20:00", "Inactive"),
+    (6, "FACE-2006", "tarun.bhatt", "Tarun Bhatt", "tarun.bhatt@example.com", "+91 98290 55667", "2026-10-15 08:55:00", "Active"),
+    (7, "FACE-2007", "ishita.roy", "Ishita Roy", "ishita.roy@example.com", "+91 98300 77889", "2026-10-18 13:10:00", "Active"),
+    (8, "FACE-2008", "harish.gowda", "Harish Gowda", "harish.gowda@example.com", "+91 98860 99001", "2026-10-21 17:25:00", "Inactive"),
+    (9, "FACE-2009", "meera.kulkarni", "Meera Kulkarni", "meera.kulkarni@example.com", "+91 98110 12345", "2026-10-23 12:00:00", "Active"),
+    (10, "FACE-2010", "rohan.sinha", "Rohan Sinha", "rohan.sinha@example.com", "+91 98760 54321", "2026-10-25 15:45:00", "Active"),
+]
+# face_logs: id, username, action, ip_address, device, browser, timestamp, status, os, location, session_id, details, match_score, liveness
+FACE_LOGS = [
+    (1, "kavya.iyer", "Face Login", "49.36.88.201", "Pixel 8", "App WebView", "2026-10-26 11:20:14", "Success", "Android 15", "Bengaluru, IN", "FC-S-71021", "Signed in by matching the face with the enrolled template.", "98.4%", "Passed"),
+    (2, "arjun.desai", "Face Verification", "106.208.14.77", "iPhone 15", "App WebView", "2026-10-26 10:55:02", "Success", "iOS 18", "Mumbai, IN", "FC-S-71009", "Verified the face to approve a payment of 12,500 INR.", "97.1%", "Passed"),
+    (3, "nisha.patel", "Face Unlock Failed", "27.61.205.9", "Galaxy S23", "App WebView", "2026-10-26 10:30:47", "Failed", "Android 14", "Surat, IN", "FC-S-70988", "The face did not match the enrolled template.", "61.3%", "Passed"),
+    (4, "sameer.joshi", "Liveness Check", "152.57.30.118", "OnePlus 12", "App WebView", "2026-10-25 21:12:33", "Success", "Android 15", "Nagpur, IN", "FC-S-70951", "Blink and head-turn challenge completed.", "96.8%", "Passed"),
+    (5, "tarun.bhatt", "Face Enrollment", "49.43.160.33", "Redmi Note 13", "App WebView", "2026-10-25 15:40:21", "Success", "Android 14", "Jaipur, IN", "FC-S-70920", "Captured 5 face angles and created a new template.", "99.0%", "Passed"),
+    (6, "ishita.roy", "Face Login", "106.220.5.147", "iPhone 14", "App WebView", "2026-10-25 13:05:58", "Failed", "iOS 18", "Kolkata, IN", "FC-S-70897", "Liveness check failed. A photo of a face was detected.", "88.0%", "Failed"),
+    (7, "harish.gowda", "Face Re-enrollment", "27.59.72.201", "Galaxy A54", "Mobile Chrome", "2026-10-24 20:48:10", "Success", "Android 13", "Mysuru, IN", "FC-S-70860", "Replaced the old face template after an app update.", "98.7%", "Passed"),
+    (8, "lakshmi.menon", "Face Verification", "117.246.18.64", "iPhone 13", "App WebView", "2026-10-24 17:22:44", "Success", "iOS 17", "Thiruvananthapuram, IN", "FC-S-70831", "Verified the face to add a new payee.", "95.5%", "Passed"),
+    (9, "meera.kulkarni", "Face Enrollment", "103.21.58.140", "Pixel 7", "App WebView", "2026-10-23 12:05:19", "Success", "Android 14", "Pune, IN", "FC-S-70790", "Captured 5 face angles and created a new template.", "98.9%", "Passed"),
+    (10, "kavya.iyer", "Face Unlock Failed", "49.36.88.201", "Pixel 8", "App WebView", "2026-10-23 09:14:36", "Failed", "Android 15", "Bengaluru, IN", "FC-S-70755", "Low light. The face could not be read clearly.", "54.2%", "Passed"),
+    (11, "rohan.sinha", "Face Login", "182.73.104.6", "Galaxy S24", "App WebView", "2026-10-22 18:33:07", "Success", "Android 15", "Delhi, IN", "FC-S-70712", "Signed in by matching the face with the enrolled template.", "97.6%", "Passed"),
+    (12, "arjun.desai", "Face Payment Approval", "106.208.14.77", "iPhone 15", "App WebView", "2026-10-22 11:47:52", "Success", "iOS 18", "Mumbai, IN", "FC-S-70689", "Approved a UPI payment of 3,200 INR with a face scan.", "96.2%", "Passed"),
+]
+
+
 def seed():
     create_users_table()
     create_page_tables()
@@ -181,7 +212,7 @@ def seed():
         cur.execute(
             "TRUNCATE date_ranges, users_page_data, overview_stats, monthly_registrations, user_distribution, "
             "recent_registrations, analytics_data, analytics_trend, analytics_roles, internet_banking_dashboard, "
-            "internet_banking_users, mobile_banking_dashboard, mobile_banking_users, user_logs_internet_banking, user_logs_mobile_banking RESTART IDENTITY CASCADE"
+            "internet_banking_users, mobile_banking_dashboard, mobile_banking_users, user_logs_internet_banking, user_logs_mobile_banking, face_users, face_logs RESTART IDENTITY CASCADE"
         )
         cur.executemany(
             "INSERT INTO users_page_data (id, name, email, role, status, registered_at) VALUES (%s, %s, %s, %s, %s, %s)",
@@ -212,6 +243,15 @@ def seed():
 
         for table, rows in LOGS.items():
             cur.executemany(f"INSERT INTO {table} ({LOG_COLUMNS}) VALUES ({', '.join(['%s'] * 12)})", rows)
+
+        cur.executemany(
+            "INSERT INTO face_users (id, user_id, username, name, email, mobile_number, registration_date, status) VALUES (%s, %s, %s, %s, %s, %s, %s, %s)",
+            FACE_USERS,
+        )
+        cur.executemany(
+            f"INSERT INTO face_logs ({LOG_COLUMNS}, match_score, liveness) VALUES ({', '.join(['%s'] * 14)})",
+            FACE_LOGS,
+        )
 
         # A starter profile for the admin account (other accounts get defaults from the users table).
         cur.execute("INSERT INTO user_profiles VALUES ('admin', 'Admin User', '9876543210') ON CONFLICT DO NOTHING")
